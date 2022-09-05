@@ -33,7 +33,7 @@ jobs:
         wget http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/ohpc-release-2-1.el8.x86_64.rpm
         rpm -ivh ohpc-release-2-1.el8.x86_64.rpm --nodeps
         wget http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm
-        rpm -ivh lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm --nodeps
+        rpm -ivh lmod-ohpc-8.2.10-15.1.ohpc.2.0.x86_64.rpm
         adduser ohpc
     - uses: actions/checkout@v2
       with:
