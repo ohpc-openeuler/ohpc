@@ -17,7 +17,7 @@ task:
 
   name: openEuler on aarch64
   arm_container:
-    image: docker.io/library/rockylinux:8
+    image: docker.io/openeuler/openeuler:22.03-lts
     cpu: 4
     memory: 12G
   script: uname -a
