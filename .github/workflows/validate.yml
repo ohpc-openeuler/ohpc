@@ -30,13 +30,7 @@ jobs:
     - name: Setup
       run: |
         dnf install -y openEuler-release dnf-plugins-core git python3 findutils rpm-build wget gawk
-        wget http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/ohpc-release-2-1.el8.x86_64.rpm
-        rpm -ivh ohpc-release-2-1.el8.x86_64.rpm --nodeps
-
-        sed -i '3c baseurl=http://121.36.3.168:82/home:/huangtianhua:/ohpc/standard_x86_64' /etc/yum.repos.d/OpenHPC.repo
-        sed -i '9c baseurl=http://121.36.3.168:82/home:/huangtianhua:/ohpc/standard_x86_64' /etc/yum.repos.d/OpenHPC.repo
-        sed -i '4c gpgcheck=0' /etc/yum.repos.d/OpenHPC.repo
-        sed -i '10c gpgcheck=0' /etc/yum.repos.d/OpenHPC.repo
+        dnf install -y http://121.36.3.168:82/home:/huangtianhua:/ohpc/standard_x86_64/x86_64/ohpc-release-2-1.oe2203.ohpc.2.0.0.x86_64.rpm
 
         yum install -y lmod-ohpc
         adduser ohpc
