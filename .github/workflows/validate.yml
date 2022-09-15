@@ -44,6 +44,7 @@ jobs:
       run: |
         . /etc/profile.d/lmod.sh
         tests/ci/run_build.py ohpc ${{ steps.files.outputs.added_modified }}
+
   build_on_leap:
     runs-on: ubuntu-latest
     container:
@@ -55,6 +56,7 @@ jobs:
         zypper -n --no-gpg-checks install http://repos.openhpc.community/OpenHPC/2/Leap_15/x86_64/ohpc-release-2-1.leap15.x86_64.rpm
         zypper -n --no-gpg-checks install lmod-ohpc
         useradd -m ohpc
+
   build_on_openEuler:
     runs-on: ubuntu-latest
     container:
