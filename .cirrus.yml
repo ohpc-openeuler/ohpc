@@ -15,6 +15,7 @@ task:
     . /etc/profile.d/lmod.sh
     tests/ci/run_build.py ohpc $(tests/ci/cirrus_get_changed_files.sh)
 
+openeuler_task:
   name: openEuler on aarch64
   arm_container:
     image: docker.io/openeuler/openeuler:22.03-lts
