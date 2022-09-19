@@ -29,6 +29,7 @@ BuildRequires: tcl tcl-devel
 Requires: tcl
 BuildRequires: lua-devel
 BuildRequires: rsync
+BuildRequires: gcc-c++ make
 
 %if 0%{?suse_version} || 0%{?sle_version}
 BuildRequires: lua-luafilesystem
@@ -38,7 +39,7 @@ Requires: lua-luafilesystem
 Requires: lua-luaposix
 Conflicts: Modules
 %else
-# If not SUSE, assume Fedora-based OS
+# If not SUSE, assume Fedora-based OS or openEuler
 BuildRequires: lua-libs
 BuildRequires: lua-filesystem
 BuildRequires: lua-posix
