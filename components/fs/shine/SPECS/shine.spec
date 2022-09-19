@@ -9,12 +9,13 @@ Version:   1.5
 Release:   1%{?dist}
 Source0:   https://github.com/cea-hpc/%{pname}/archive/v%{version}.tar.gz
 Patch1:    29fbd8ca10bf6d672d25439a025c460001fad33e.patch 
+Patch2:    python3-compat.patch
 License:   GPLv2
 Group:     %{PROJ_NAME}/lustre
 Vendor:    CEA
 Url:       http://lustre-shine.sourceforge.net/
 BuildArch: noarch
-BuildRequires: python
+BuildRequires: python3
 #!BuildIgnore: post-build-checks
 Requires:  clustershell%{PROJ_DELIM} >= 1.5.1
 Requires:  lmod%{PROJ_DELIM} >= 7.6.1
@@ -29,6 +30,7 @@ Lustre administration utility.
 %prep
 %setup -q -n %{pname}-%{version}
 %patch1 -p1
+%patch2 -p1
 
 %build
 export SHINEVERSION=%{version}
