@@ -27,6 +27,7 @@ Requires:      autoconf%{PROJ_DELIM} >= 2.69
 BuildRequires: autoconf%{PROJ_DELIM} >= 2.69
 
 BuildRequires: perl(Thread::Queue) make
+
 %if 0%{?openEuler}
 BuildRequires: perl-Thread-Queue
 Requires: perl-Thread-Queue
