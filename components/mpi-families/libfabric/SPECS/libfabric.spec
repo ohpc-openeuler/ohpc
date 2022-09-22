@@ -21,14 +21,15 @@ Summary: User-space RDMA Fabric Interfaces
 Group:   %{PROJ_NAME}/mpi-families
 License: GPLv2 or BSD
 Url:     http://www.github.com/ofiwg/libfabric
-Source:  https://github.com/ofiwg/%{pname}/releases/download/v%{version}/%{pname}-%{version}.tar.bz2
+Source0:  https://github.com/ofiwg/%{pname}/releases/download/v%{version}/%{pname}-%{version}.tar.bz2
 
+BuildRequires: rdma-core-devel
 %if 0%{?suse_version}
 Buildrequires: ofed
-BuildRequires: rdma-core-devel infiniband-diags-devel
+BuildRequires: infiniband-diags-devel
 %endif
 %if 0%{?rhel}
-Buildrequires: rdma-core-devel libibmad-devel
+Buildrequires: libibmad-devel
 %endif
 %ifarch x86_64
 BuildRequires: libpsm2-devel >= 10.2.0
