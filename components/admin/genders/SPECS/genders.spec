@@ -16,16 +16,22 @@ Version: 1.27
 Release: 1%{?dist}
 Summary: Static cluster configuration database
 License: GPL
-Source:  https://github.com/chaos/genders/archive/genders-1-27-3.tar.gz
+Source0: https://github.com/chaos/genders/archive/genders-1-27-3.tar.gz
 Group:   %{PROJ_NAME}/admin
 URL:     https://github.com/chaos/genders
 
 Requires: perl
-BuildRequires: gcc-c++
+BuildRequires: gcc-c++ make
 BuildRequires: bison flex
 BuildRequires: perl(ExtUtils::MakeMaker)
+%if 0%{?openEuler}
+BuildRequires: python3
+BuildRequires: python3-devel
+BuildRequires: perl-devel byacc
+%else
 BuildRequires: python2
 BuildRequires: python2-devel
+%endif
 
 %if 0%{?rhel_version}
 BuildRequires: byacc
@@ -60,8 +66,12 @@ genders API that is compatible with earlier releases of genders
 %setup  -q -n %{pname}-%{pname}-1-27-3
 
 %build
+PYTHON_PATH=/usr/bin/python2
+%if 0%{?openEuler}
+PYTHON_PATH=/usr/bin/python3
+%endif
 
-%configure PYTHON=/usr/bin/python2 --program-prefix=%{?_program_prefix:%{_program_prefix}} \
+%configure PYTHON=$PYTHON_PATH --program-prefix=%{?_program_prefix:%{_program_prefix}} \
     --with-extension-destdir="$RPM_BUILD_ROOT" \
     %{?_with_perl_extensions} \
     %{?_without_perl_extensions} \
@@ -78,6 +88,9 @@ make
 
 %install
 DESTDIR="$RPM_BUILD_ROOT" make install
+%if 0%{?openEuler}
+chmod -R 0755 $RPM_BUILD_ROOT%{_libdir}/
+%endif
 
 find "$RPM_BUILD_ROOT" -name .packlist -exec sed -i "s#$RPM_BUILD_ROOT##" {} \;
 find "$RPM_BUILD_ROOT" -name .packlist -exec sed -i '/BUILDROOT/d'        {} \;
