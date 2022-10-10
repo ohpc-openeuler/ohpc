@@ -1,0 +1,1102 @@
+diff --git a/lib/Shine/CLI/Display.py b/lib/Shine/CLI/Display.py
+index 69410a2..02c0f74 100644
+--- a/lib/Shine/CLI/Display.py
++++ b/lib/Shine/CLI/Display.py
+@@ -154,11 +154,12 @@ def table_fill(tbl, fs, sort_key=None, supports=None, viewsupports=None):
+                comps.groupby(key=fieldvals) ]
+ 
+     # Sort
+-    def sorter((first, _)):
++    def sorter(compgrp):
+         """
+         Sort grplist based on provided sort_key for the first element of
+         compgrp.
+         """
++        (first, _) = compgrp
+         if sort_key is None:
+             return None
+         return sort_key(first)
+diff --git a/lib/Shine/CLI/TextTable.py b/lib/Shine/CLI/TextTable.py
+index 5d824e9..7dc97bb 100644
+--- a/lib/Shine/CLI/TextTable.py
++++ b/lib/Shine/CLI/TextTable.py
+@@ -131,7 +131,7 @@ class TextTable(object):
+                 length = matchobj.group(2) or self._max_width[key]
+                 length = int(length)
+                 value = getter(key) or ""
+-            except KeyError, ex:
++            except KeyError as ex:
+                 if self.ignore_bad_keys:
+                     value = "%%%s" % key
+                     length = len(value)
+diff --git a/lib/Shine/Commands/Base/FSEventHandler.py b/lib/Shine/Commands/Base/FSEventHandler.py
+index 572fcfe..3de1ad2 100644
+--- a/lib/Shine/Commands/Base/FSEventHandler.py
++++ b/lib/Shine/Commands/Base/FSEventHandler.py
+@@ -22,6 +22,8 @@
+ Command event handler classes used to display information when receiving events.
+ """
+ 
++from __future__ import print_function
++
+ import datetime
+ 
+ from ClusterShell.Task import task_self
+@@ -74,17 +76,17 @@ class FSLocalEventHandler(LustreEH):
+ 
+     def log_warning(self, msg):
+         """Display a warning message."""
+-        print msg
++        print(msg)
+ 
+     def log_info(self, msg):
+         """Display an informative message, only if verbosity is not 0."""
+         if self.verbose > 0:
+-            print msg
++            print(msg)
+ 
+     def log_verbose(self, msg):
+         """Display a verbose message. Verbosity should be 2 or above."""
+         if self.verbose > 1:
+-            print msg
++            print(msg)
+ 
+     def log_detail(self, msg):
+         """Display a 'detail' message (more than verbose).
+@@ -92,7 +94,7 @@ class FSLocalEventHandler(LustreEH):
+         Verbosity should be 3 or above.
+         """
+         if self.verbose > 2:
+-            print msg
++            print(msg)
+ 
+     #
+     # Event handlers
+@@ -198,7 +200,7 @@ class FSLocalEventHandler(LustreEH):
+         SUMMARY is set for this command (True by default).
+         """
+         if self.SUMMARY and self.verbose > 0:
+-            print display(self.command, fs, supports=self.fs_action)
++            print(display(self.command, fs, supports=self.fs_action))
+ 
+     def post(self, fs):
+         """Do any post-processing. This is called for each filesystem."""
+@@ -254,11 +256,11 @@ class FSGlobalEventHandler(FSLocalEventHandler):
+             self.status_changed = False
+             now = datetime.datetime.now().strftime("%H:%M")
+             if len(target_servers) > 8:
+-                print "[%s] In progress for %d component(s) on %d servers ..." \
+-                    % (now, target_count, len(target_servers))
++                print("[%s] In progress for %d component(s) on %d servers ..."
++                      % (now, target_count, len(target_servers)))
+             else:
+-                print "[%s] In progress for %d component(s) on %s ..." % \
+-                      (now, target_count, target_servers)
++                print("[%s] In progress for %d component(s) on %s ..." %
++                      (now, target_count, target_servers))
+ 
+     def _update(self):
+         """
+diff --git a/lib/Shine/Commands/Base/FSLiveCommand.py b/lib/Shine/Commands/Base/FSLiveCommand.py
+index b866c6e..6fd986d 100644
+--- a/lib/Shine/Commands/Base/FSLiveCommand.py
++++ b/lib/Shine/Commands/Base/FSLiveCommand.py
+@@ -22,6 +22,8 @@
+ Base class for live filesystem commands (start, stop, status, etc.).
+ """
+ 
++from __future__ import print_function
++
+ from Shine.Configuration.Globals import Globals
+ 
+ from Shine.Commands.Base.Command import RemoteCommand, CommandHelpException
+@@ -45,7 +47,7 @@ class FSLiveCommand(RemoteCommand):
+ 
+     CRITICAL = False
+ 
+-    TARGET_STATUS_RC_MAP = { }
++    TARGET_STATUS_RC_MAP = {}
+ 
+     def fs_status_to_rc(self, status):
+         return self.TARGET_STATUS_RC_MAP.get(status, RC_RUNTIME_ERROR)
+@@ -97,7 +99,7 @@ class FSLiveCommand(RemoteCommand):
+ 
+             # Separate each fsname with a blank line
+             if not first:
+-                print
++                print()
+             first = False
+ 
+             # Run the real job
+diff --git a/lib/Shine/Commands/Config.py b/lib/Shine/Commands/Config.py
+index ae94190..c3d4fa1 100644
+--- a/lib/Shine/Commands/Config.py
++++ b/lib/Shine/Commands/Config.py
+@@ -18,6 +18,8 @@
+ # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #
+ 
++from __future__ import print_function
++
+ from Shine.CLI.Display import display
+ 
+ from Shine.Commands.Base.FSLiveCommand import FSLiveCommand
+@@ -37,4 +39,4 @@ class Config(FSLiveCommand):
+     DESCRIPTION = "Display filesystem component information"
+ 
+     def execute_fs(self, fs, fs_conf, hdl, vlevel):
+-        print display(self, fs)
++        print(display(self, fs))
+diff --git a/lib/Shine/Commands/Execute.py b/lib/Shine/Commands/Execute.py
+index 57c6425..f92df78 100644
+--- a/lib/Shine/Commands/Execute.py
++++ b/lib/Shine/Commands/Execute.py
+@@ -23,6 +23,8 @@ Shine `execute' command classes.
+ 
+ """
+ 
++from __future__ import print_function
++
+ # Command base class
+ from Shine.Commands.Base.FSLiveCommand import FSLiveCommand, \
+                                               CommandHelpException
+@@ -86,11 +88,11 @@ class Execute(FSLiveCommand):
+ 
+         if rc == RC_OK:
+             if vlevel > 0:
+-                print "Execute successful."
++                print("Execute successful.")
+ 
+         elif rc == RC_RUNTIME_ERROR:
+             self.display_proxy_errors(fs)
+-            print
++            print()
+ 
+         # Call a post_format method if defined by the event handler.
+         if hasattr(eh, 'post'):
+diff --git a/lib/Shine/Commands/Format.py b/lib/Shine/Commands/Format.py
+index 1c93324..f4cab20 100644
+--- a/lib/Shine/Commands/Format.py
++++ b/lib/Shine/Commands/Format.py
+@@ -23,6 +23,8 @@ Shine `format' classes.
+ Format or reformat any installed filesystem.
+ """
+ 
++from __future__ import print_function
++
+ # Command base class
+ from Shine.Commands.Base.FSLiveCommand import FSLiveCommand
+ from Shine.Commands.Base.CommandRCDefs import RC_OK, RC_ST_EXTERNAL, \
+@@ -98,12 +100,12 @@ class Format(FSLiveCommand):
+ 
+         if rc == RC_OK:
+             if vlevel > 0:
+-                print "Format successful."
++                print("Format successful.")
+         else:
+             if rc == RC_RUNTIME_ERROR:
+                 self.display_proxy_errors(fs)
+             if vlevel > 0:
+-                print "Format failed"
++                print("Format failed")
+ 
+         # Call a post_format method if defined by the event handler.
+         if hasattr(eh, 'post'):
+diff --git a/lib/Shine/Commands/Fsck.py b/lib/Shine/Commands/Fsck.py
+index ed9116c..6203ed8 100644
+--- a/lib/Shine/Commands/Fsck.py
++++ b/lib/Shine/Commands/Fsck.py
+@@ -24,6 +24,8 @@ Shine `fsck' command.
+ Run a low-level filesystem check for filesystem targets.
+ """
+ 
++from __future__ import print_function
++
+ import sys
+ 
+ # Command base class
+@@ -128,12 +130,12 @@ class Fsck(FSLiveCommand):
+ 
+         if rc == RC_OK:
+             if vlevel > 0:
+-                print "Fsck successful."
++                print("Fsck successful.")
+         else:
+             if rc == RC_RUNTIME_ERROR:
+                 self.display_proxy_errors(fs)
+             if vlevel > 0:
+-                print "Fsck failed"
++                print("Fsck failed")
+ 
+         # Call a post_fsck method if defined by the event handler.
+         if hasattr(eh, 'post'):
+diff --git a/lib/Shine/Commands/Install.py b/lib/Shine/Commands/Install.py
+index 5b70ac3..1202d15 100644
+--- a/lib/Shine/Commands/Install.py
++++ b/lib/Shine/Commands/Install.py
+@@ -18,6 +18,8 @@
+ # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #
+ 
++from __future__ import print_function
++
+ import sys
+ 
+ from Shine.Configuration.Globals import Globals
+@@ -59,7 +61,7 @@ class Install(Command):
+         # Use this Shine.FSUtils convenience function.
+         lmf = self.get_lmf_path()
+         if lmf:
+-            print "Using Lustre model file %s" % lmf
++            print("Using Lustre model file %s" % lmf)
+         else:
+             raise CommandHelpException("Lustre model file for ``%s'' not found:"
+                         " please use filename or full LMF path.\n"
+@@ -74,16 +76,16 @@ class Install(Command):
+                                       excluded=excluded_nodes)
+ 
+         # Register the filesystem in backend
+-        print "Registering FS %s to backend..." % fs.fs_name
++        print("Registering FS %s to backend..." % fs.fs_name)
+         if self.options.dryrun:
+             rc = 0
+         else:
+             rc = self.register_fs(fs_conf)
+         if rc:
+             msg = "Error: failed to register FS to backend (rc=%d)" % rc
+-            print >> sys.stderr, msg
++            print(msg, file=sys.stderr)
+         else:
+-            print "Filesystem %s registered." % fs.fs_name
++            print("Filesystem %s registered." % fs.fs_name)
+ 
+         # Helper message.
+         # If user specified nodes which were not used, warn him about it.
+@@ -104,15 +106,15 @@ class Install(Command):
+             if tuning_conf:
+                 fs.install(tuning_conf, dryrun=self.options.dryrun)
+ 
+-        except FSRemoteError, error:
+-            print "WARNING: Due to error, installation skipped on %s" \
+-                   % error.nodes
++        except FSRemoteError as error:
++            print("WARNING: Due to error, installation skipped on %s"
++                  % error.nodes)
+             rc = RC_FAILURE
+ 
+         if not install_nodes and not excluded_nodes:
+             # Give pointer to next user step.
+-            print "Use `shine format -f %s' to initialize the file system." % \
+-                    fs_conf.get_fs_name()
++            print("Use `shine format -f %s' to initialize the file system." %
++                  fs_conf.get_fs_name())
+ 
+         return rc
+ 
+diff --git a/lib/Shine/Commands/List.py b/lib/Shine/Commands/List.py
+index 60492e3..fa9d614 100644
+--- a/lib/Shine/Commands/List.py
++++ b/lib/Shine/Commands/List.py
+@@ -25,6 +25,8 @@ Shine `list' command classes.
+ List installed filename names.
+ """
+ 
++from __future__ import print_function
++
+ from Shine.Commands.Base.Command import Command
+ 
+ class List(Command):
+@@ -45,4 +47,4 @@ class List(Command):
+         self.forbidden(self.options.indexes, "-i")
+         self.forbidden(self.options.failover, "-F")
+ 
+-        print "\n".join(self.iter_fsname())
++        print("\n".join(self.iter_fsname()))
+diff --git a/lib/Shine/Commands/Mount.py b/lib/Shine/Commands/Mount.py
+index 048c8fb..5121ad6 100644
+--- a/lib/Shine/Commands/Mount.py
++++ b/lib/Shine/Commands/Mount.py
+@@ -24,6 +24,8 @@ Shine `mount' command classes.
+ The mount command aims to start Lustre filesystem clients.
+ """
+ 
++from __future__ import print_function
++
+ # Command helper
+ from Shine.Commands.Tune import Tune
+ 
+@@ -80,8 +82,8 @@ class Mount(FSLiveCommand):
+             if rc == RC_OK:
+                 if vlevel > 0:
+                     key = lambda c: c.state == MOUNTED
+-                    print "%s was successfully mounted on %s" % \
+-                        (fs.fs_name, comps.filter(key=key).servers())
++                    print("%s was successfully mounted on %s" %
++                          (fs.fs_name, comps.filter(key=key).servers()))
+             elif rc == RC_RUNTIME_ERROR:
+                 self.display_proxy_errors(fs)
+ 
+diff --git a/lib/Shine/Commands/Remove.py b/lib/Shine/Commands/Remove.py
+index fc0a341..1807943 100644
+--- a/lib/Shine/Commands/Remove.py
++++ b/lib/Shine/Commands/Remove.py
+@@ -26,6 +26,8 @@ The remove command aims to uninstall a Lustre filesystem setup with Shine.
+ This will interact with the backend and will remove local cached files.
+ """
+ 
++from __future__ import print_function
++
+ import sys
+ 
+ from Shine.Configuration.FileSystem import ModelFileIOError
+@@ -85,12 +87,12 @@ class Remove(FSLiveCommand):
+                 # Mounted filesystem!
+                 if state in [MOUNTED, RECOVERING]:
+                     labels = targets.labels()
+-                    print "WARNING: Some targets are started: %s" % labels
++                    print("WARNING: Some targets are started: %s" % labels)
+                 # Error, won't be able to remove on these nodes
+                 elif state == RUNTIME_ERROR:
+                     self.display_proxy_errors(fs)
+-                    print "WARNING: Removing %s might failed on some nodes " \
+-                          "(see above)!" % fs.fs_name
++                    print("WARNING: Removing %s might failed on some nodes "
++                          "(see above)!" % fs.fs_name)
+ 
+             # Confirmation
+             if not self.ask_confirm("Please confirm the removal of filesystem" \
+@@ -98,10 +100,10 @@ class Remove(FSLiveCommand):
+                 return RC_FAILURE
+ 
+             # Do the job now!
+-            print "Removing filesystem %s..." % fs.fs_name
++            print("Removing filesystem %s..." % fs.fs_name)
+             if fs.remove(dryrun=self.options.dryrun):
+-                print "WARNING: failed to remove all filesystem %s " \
+-                      "configuration files" % fs.fs_name
++                print("WARNING: failed to remove all filesystem %s "
++                      "configuration files" % fs.fs_name)
+ 
+             # XXX: This is not really nice. Need to find a better way.
+             if not self.options.nodes \
+@@ -111,7 +113,7 @@ class Remove(FSLiveCommand):
+                and not self.options.failover \
+                and not self.options.indexes:
+ 
+-                print "Unregistering FS %s from backend..." % fs.fs_name
++                print("Unregistering FS %s from backend..." % fs.fs_name)
+                 if self.options.dryrun:
+                     retcode = 0
+                 else:
+@@ -119,10 +121,10 @@ class Remove(FSLiveCommand):
+                 if retcode:
+                     msg = "Error: failed to unregister FS from backend " \
+                           "(rc = %d)" % retcode
+-                    print >> sys.stderr, msg
++                    print(msg, file=sys.stderr)
+                     return RC_FAILURE
+ 
+-            print "Filesystem %s removed." % fs.fs_name
++            print("Filesystem %s removed." % fs.fs_name)
+ 
+         # Local mode (either -R or -L)
+         else:
+@@ -130,11 +132,11 @@ class Remove(FSLiveCommand):
+                 if self.options.local:
+                     msg = "Error: failed to remove filesystem ```%s'' " \
+                           "configuration files" % fs.fs_name
+-                    print >> sys.stderr, msg
++                    print(msg, file=sys.stderr)
+                 return RC_FAILURE
+ 
+             elif self.options.local:
+-                print "Filesystem %s removed." % fs.fs_name
++                print("Filesystem %s removed." % fs.fs_name)
+ 
+         return rc
+ 
+diff --git a/lib/Shine/Commands/Show.py b/lib/Shine/Commands/Show.py
+index c45c47a..ca8f9fa 100644
+--- a/lib/Shine/Commands/Show.py
++++ b/lib/Shine/Commands/Show.py
+@@ -24,6 +24,8 @@ Shine `show' command classes.
+ The show command aims to show various shine configuration parameters.
+ """
+ 
++from __future__ import print_function
++
+ import sys
+ 
+ # Configuration
+@@ -53,7 +55,7 @@ class Show(Command):
+ 
+         for key, value in Globals().as_dict().items():
+             tbl.append({'param': key, 'value': str(value)})
+-        print str(tbl)
++        print(str(tbl))
+         return 0
+ 
+     def cmd_show_fs(self):
+@@ -67,15 +69,15 @@ class Show(Command):
+             try:
+                 fs_conf = Configuration.load_from_cache(fsname)
+             except:
+-                print "Error with FS ``%s'' configuration files." % fsname
++                print("Error with FS ``%s'' configuration files." % fsname)
+                 raise
+             if not verb:
+-                print fs_conf.get_fs_name()
++                print(fs_conf.get_fs_name())
+             else:
+                 tbl.append({'fsname': fs_conf.get_fs_name(),
+                             'description': fs_conf.get_description()})
+         if verb:
+-            print str(tbl)
++            print(str(tbl))
+ 
+         return 0
+ 
+@@ -92,7 +94,7 @@ class Show(Command):
+                 # We fail to get current file system configuration information.
+                 # Display an error message.
+                 msg = "Error with FS ``%s'' configuration files." % fsname
+-                print >> sys.stderr, msg
++                print(msg, file=sys.stderr)
+                 raise
+ 
+             # Retrieve quota configuration information
+@@ -144,7 +146,7 @@ class Show(Command):
+                         'value': fs_conf.get_description()})
+ 
+             # Display the list of collected configuration information
+-            print str(tbl)
++            print(str(tbl))
+ 
+ 
+     def cmd_show_storage(self):
+@@ -156,16 +158,16 @@ class Show(Command):
+             assert Globals().get_backend() == "None", \
+                     "Error: please check your storage backend configuration" \
+                     "(backend=%s)" % Globals().get_backend()
+-            print "Storage backend is disabled, please check storage " \
+-                  "information as a per-filesystem basis with ``show info''."
++            print("Storage backend is disabled, please check storage "
++                  "information as a per-filesystem basis with ``show info''.")
+         else:
+             backend.start()
+             cnt = 0
+             for tgt in [ 'mgt', 'mdt', 'ost']:
+                 for dev in backend.get_target_devices(tgt):
+-                    print dev
++                    print(dev)
+                     cnt += 1
+-            print "Total: %d devices" % cnt
++            print("Total: %d devices" % cnt)
+         return 0
+ 
+     def execute(self):
+diff --git a/lib/Shine/Commands/Start.py b/lib/Shine/Commands/Start.py
+index 861655c..68ffd76 100644
+--- a/lib/Shine/Commands/Start.py
++++ b/lib/Shine/Commands/Start.py
+@@ -26,6 +26,8 @@ of the filesystem targets on local or remote servers. It is available
+ for any filesystems previously installed and formatted.
+ """
+ 
++from __future__ import print_function
++
+ from Shine.Commands.Tune import Tune
+ 
+ # Command base class
+@@ -98,7 +100,7 @@ class Start(FSLiveCommand):
+ 
+         if rc == RC_OK:
+             if vlevel > 0:
+-                print "Start successful."
++                print("Start successful.")
+         elif rc == RC_RUNTIME_ERROR:
+             self.display_proxy_errors(fs)
+ 
+diff --git a/lib/Shine/Commands/Status.py b/lib/Shine/Commands/Status.py
+index 8a0ab5c..68d217d 100644
+--- a/lib/Shine/Commands/Status.py
++++ b/lib/Shine/Commands/Status.py
+@@ -28,6 +28,8 @@ of the filesystem, or if needed, to enquire about filesystem components
+ detailed states.
+ """
+ 
++from __future__ import print_function
++
+ # Command base class
+ from Shine.Commands.Base.FSLiveCommand import FSLiveCommand
+ from Shine.Commands.Base.CommandRCDefs import RC_ST_OFFLINE, RC_ST_EXTERNAL, \
+@@ -93,7 +95,7 @@ class Status(FSLiveCommand):
+         # Display error messages for each node that failed.
+         if len(fs.proxy_errors) > 0:
+             self.display_proxy_errors(fs)
+-            print
++            print()
+ 
+         result = self.fs_status_to_rc(fs_result)
+ 
+diff --git a/lib/Shine/Commands/Stop.py b/lib/Shine/Commands/Stop.py
+index 4b9a297..d57d565 100644
+--- a/lib/Shine/Commands/Stop.py
++++ b/lib/Shine/Commands/Stop.py
+@@ -26,6 +26,8 @@ of the filesystem targets on local or remote servers. It is available
+ for any filesystems previously installed and formatted.
+ """
+ 
++from __future__ import print_function
++
+ # Command base class
+ from Shine.Commands.Base.FSLiveCommand import FSLiveCommand
+ from Shine.Commands.Base.CommandRCDefs import RC_OK, RC_ST_EXTERNAL, \
+@@ -87,7 +89,7 @@ class Stop(FSLiveCommand):
+ 
+         if rc == RC_OK:
+             if vlevel > 0:
+-                print "Stop successful."
++                print("Stop successful.")
+         elif rc == RC_RUNTIME_ERROR:
+             self.display_proxy_errors(fs)
+ 
+diff --git a/lib/Shine/Commands/Tune.py b/lib/Shine/Commands/Tune.py
+index 34a71f8..92e625c 100644
+--- a/lib/Shine/Commands/Tune.py
++++ b/lib/Shine/Commands/Tune.py
+@@ -26,6 +26,8 @@ The tune command aims to apply tuning parameters on any components of a
+ Lustre filesystem.
+ """
+ 
++from __future__ import print_function
++
+ from Shine.Configuration.Globals import Globals
+ 
+ from Shine.Configuration.TuningModel import TuningModel
+@@ -62,10 +64,10 @@ class Tune(FSLiveCommand):
+         tuning = self.get_tuning(fs_conf, fs.components)
+ 
+         if vlevel > 1:
+-            print "Tuning filesystem %s..." % fs.fs_name
++            print("Tuning filesystem %s..." % fs.fs_name)
+ 
+         if not self.options.remote and vlevel > 1:
+-            print tuning
++            print(tuning)
+ 
+         # Call a pre_format method if defined by event handler
+         if hasattr(eh, 'pre'):
+@@ -75,10 +77,10 @@ class Tune(FSLiveCommand):
+                          dryrun=self.options.dryrun,
+                          fanout=self.options.fanout)
+         if status == MOUNTED:
+-            print "Filesystem %s successfully tuned." % fs.fs_name
++            print("Filesystem %s successfully tuned." % fs.fs_name)
+         else:
+             self.display_proxy_errors(fs)
+-            print "Tuning of filesystem %s failed." % fs.fs_name
++            print("Tuning of filesystem %s failed." % fs.fs_name)
+             return RC_RUNTIME_ERROR
+ 
+         return RC_OK
+diff --git a/lib/Shine/Commands/Tunefs.py b/lib/Shine/Commands/Tunefs.py
+index 2042680..c43ed08 100644
+--- a/lib/Shine/Commands/Tunefs.py
++++ b/lib/Shine/Commands/Tunefs.py
+@@ -25,6 +25,8 @@ The tunefs command aims to modify target on-disk parameter without reformating
+ it.
+ """
+ 
++from __future__ import print_function
++
+ # Command base class
+ from Shine.Commands.Base.FSLiveCommand import FSLiveCommand
+ from Shine.Commands.Base.CommandRCDefs import RC_OK, RC_ST_EXTERNAL, \
+@@ -97,12 +99,12 @@ class Tunefs(FSLiveCommand):
+ 
+         if rc == RC_OK:
+             if vlevel > 0:
+-                print "Tunefs successful."
++                print("Tunefs successful.")
+         else:
+             if rc == RC_RUNTIME_ERROR:
+                 self.display_proxy_errors(fs)
+             if vlevel > 0:
+-                print "Tunefs failed"
++                print("Tunefs failed")
+ 
+         # Call a post_tunefs method if defined by the event handler.
+         if hasattr(eh, 'post'):
+diff --git a/lib/Shine/Commands/Umount.py b/lib/Shine/Commands/Umount.py
+index 3a1e657..5c96623 100644
+--- a/lib/Shine/Commands/Umount.py
++++ b/lib/Shine/Commands/Umount.py
+@@ -24,6 +24,8 @@ Shine `umount' command classes.
+ The umount command aims to stop Lustre filesystem clients.
+ """
+ 
++from __future__ import print_function
++
+ # Command base class
+ from Shine.Commands.Base.FSLiveCommand import FSLiveCommand
+ from Shine.Commands.Base.CommandRCDefs import RC_OK, \
+@@ -77,8 +79,8 @@ class Umount(FSLiveCommand):
+             if rc == RC_OK:
+                 if vlevel > 0:
+                     key = lambda c: c.state == OFFLINE
+-                    print "%s was successfully unmounted on %s" % \
+-                        (fs.fs_name, comps.filter(key=key).servers())
++                    print("%s was successfully unmounted on %s" %
++                          (fs.fs_name, comps.filter(key=key).servers()))
+             elif rc == RC_RUNTIME_ERROR:
+                 self.display_proxy_errors(fs)
+ 
+diff --git a/lib/Shine/Commands/Update.py b/lib/Shine/Commands/Update.py
+index e37848f..63a70d3 100644
+--- a/lib/Shine/Commands/Update.py
++++ b/lib/Shine/Commands/Update.py
+@@ -22,6 +22,8 @@
+ Shine 'update' command class.
+ """
+ 
++from __future__ import print_function
++
+ from Shine.Configuration.Globals import Globals
+ 
+ from Shine.Commands.Base.Command import Command, CommandHelpException
+@@ -60,7 +62,7 @@ class Update(Command):
+ 
+         lmf = self.get_lmf_path()
+         if lmf:
+-            print "Using Lustre model file %s" % lmf
++            print("Using Lustre model file %s" % lmf)
+         else:
+             raise CommandHelpException("Lustre model file for ``%s'' not found:"
+                     " please use filename or full LMF path.\n Your default "
+@@ -70,18 +72,18 @@ class Update(Command):
+ 
+     def __warning(self, message):
+         """Helper to display a warning message."""
+-        print "WARNING: %s" % message
++        print("WARNING: %s" % message)
+ 
+     def __verbose(self, message):
+         """Helper to display a verbose message, if enabled."""
+         # XXX: Should use a constant here
+         if self.options.verbose > 0:
+-            print message
++            print(message)
+ 
+     def __debug(self, message):
+         """Helper to display a debug message, if enabled."""
+         if self.options.debug:
+-            print "DEBUG ", message
++            print("DEBUG ", message)
+ 
+     @classmethod
+     def display_details(cls, comps):
+@@ -121,7 +123,7 @@ class Update(Command):
+             txt += txt_new
+ 
+         if txt:
+-            print "FILESYSTEM CHANGES\n%s\n" % "\n".join(txt)
++            print("FILESYSTEM CHANGES\n%s\n" % "\n".join(txt))
+ 
+     def _apply(self, fs, action, actiontxt, comps, expected):
+         """Apply an action on the provided filesystem and check for errors."""
+@@ -184,7 +186,7 @@ class Update(Command):
+         try:
+             self.__verbose("Update configuration file: %s" % conf_file)
+             fs.install(conf_file, dryrun=self.options.dryrun)
+-        except FSRemoteError, error:
++        except FSRemoteError as error:
+             self.__warning("Due to error, configuration update skipped on %s" \
+                % error.nodes)
+             return RC_FAILURE
+@@ -293,10 +295,10 @@ class Update(Command):
+                 self.__verbose("Remove configuration from %s" % removedsrvs)
+                 self._remove(oldfs, oldfs.remove, "uninstall", removedsrvs)
+ 
+-        except CannotApplyError, exp:
++        except CannotApplyError as exp:
+             self.__warning(str(exp))
+-            print "Please fix the error or disable %s and restart the update" \
+-                  % exp.elements + " command"
++            print("Please fix the error or disable %s and restart the update"
++                  % exp.elements + " command")
+             return 1
+             
+ 
+@@ -387,11 +389,11 @@ class Update(Command):
+ 
+         # Print this line only if there is other actions to be performed
+         if next_actions:
+-            print
+-            print "NEXT ACTIONS (should be done manually)"
++            print()
++            print("NEXT ACTIONS (should be done manually)")
+             for txt in next_actions:
+-                print ">%s" % txt
++                print(">%s" % txt)
+ 
+-        print "Update is finished."
++        print("Update is finished.")
+ 
+         return rc
+diff --git a/lib/Shine/Configuration/FileSystem.py b/lib/Shine/Configuration/FileSystem.py
+index 087cc89..82d8868 100644
+--- a/lib/Shine/Configuration/FileSystem.py
++++ b/lib/Shine/Configuration/FileSystem.py
+@@ -304,7 +304,7 @@ class FileSystem(object):
+                             self.model.elements(target).parse(
+                                                             matching.getline())
+ 
+-                except KeyError, error:
++                except KeyError as error:
+                     raise ConfigInvalidFileSystem(self, \
+                             "Index %s for %s used twice." % \
+                             (str(error), target))
+@@ -329,7 +329,7 @@ class FileSystem(object):
+                             params.add('index', str(indexes[0]))
+                             indexes.remove(indexes[0])
+ 
+-                except KeyError, error:
++                except KeyError as error:
+                     raise ConfigInvalidFileSystem(self, \
+                              "Index %s for %s used twice." % \
+                               (str(error), target))
+diff --git a/lib/Shine/Configuration/ModelFile.py b/lib/Shine/Configuration/ModelFile.py
+index c4216f6..7ceb192 100644
+--- a/lib/Shine/Configuration/ModelFile.py
++++ b/lib/Shine/Configuration/ModelFile.py
+@@ -158,7 +158,7 @@ class SimpleElement(object):
+                     retval = int(value, base=16)
+                 else:
+                     retval = int(value)
+-            except ValueError, error:
++            except ValueError as error:
+                 raise ModelFileValueError(str(error))
+             return retval
+ 
+@@ -686,7 +686,7 @@ class ModelFile(object):
+                     raise ModelFileValueError("Wrong syntax '%s'" % line)
+                 try:
+                     self._elements[key.strip()].parse(value.strip())
+-                except KeyError, exp:
++                except KeyError as exp:
+                     raise ModelFileValueError("Unknown key %s" % exp)
+ 
+     # File handling
+@@ -699,7 +699,7 @@ class ModelFile(object):
+             if line:
+                 try:
+                     self.parse(line)
+-                except ModelFileValueError, error:
++                except ModelFileValueError as error:
+                     raise ModelFileValueError("%s at %s:%d" % \
+                                                 (error, filename, nbr + 1))
+         modelfd.close()
+diff --git a/lib/Shine/Configuration/TuningModel.py b/lib/Shine/Configuration/TuningModel.py
+index 048b0e9..8756395 100644
+--- a/lib/Shine/Configuration/TuningModel.py
++++ b/lib/Shine/Configuration/TuningModel.py
+@@ -191,7 +191,7 @@ class TuningModel(object):
+ 
+             tuning_file.close()
+ 
+-        except IOError, error:
++        except IOError as error:
+             msg = "Error while reading tuning configuration file: %s" % error
+             raise TuningError(msg)
+ 
+diff --git a/lib/Shine/Controller.py b/lib/Shine/Controller.py
+index 1d32353..ad4823b 100644
+--- a/lib/Shine/Controller.py
++++ b/lib/Shine/Controller.py
+@@ -46,9 +46,9 @@ from ClusterShell.NodeSet import NodeSet, NodeSetException, NodeSetParseError, \
+ def print_csdebug(task, msg):
+     match = re.match(r'\w+: SHINE:\d:', msg)
+     if match:
+-        print "%s<pickle>" % match.group(0)
++        print("%s<pickle>" % match.group(0))
+     else:
+-        print msg
++        print(msg)
+ 
+ 
+ class Controller(object):
+@@ -253,26 +253,26 @@ class Controller(object):
+             command = COMMAND_LIST[cmdname](options, args)
+             rc = command.filter_rc(command.execute())
+ 
+-        except CommandHelpException, error:
++        except CommandHelpException as error:
+             self.print_error(error)
+ 
+         # Command exceptions
+-        except DisplayError, error:
++        except DisplayError as error:
+             self.print_error(error)
+-        except CommandException, error:
++        except CommandException as error:
+             self.print_error(error)
+ 
+         # Configuration exceptions
+-        except ConfigException, error:
++        except ConfigException as error:
+             self.print_error("Configuration - %s" % error)
+-        except ModelFileValueError, error:
++        except ModelFileValueError as error:
+             self.print_error(error)
+ 
+         # File system exceptions
+-        except FSRemoteError, error:
++        except FSRemoteError as error:
+             self.print_error(error)
+             rc = error.rc
+-        except [ComponentError, NodeSetParseError, RangeSetParseError], error:
++        except [ComponentError, NodeSetParseError, RangeSetParseError] as error:
+             self.print_error(error)
+ 
+         # Special error
+diff --git a/lib/Shine/Lustre/Actions/Action.py b/lib/Shine/Lustre/Actions/Action.py
+index 203b88c..bca6fbb 100644
+--- a/lib/Shine/Lustre/Actions/Action.py
++++ b/lib/Shine/Lustre/Actions/Action.py
+@@ -395,7 +395,7 @@ class FSAction(CommonAction):
+                 self.comp.action_event(self, 'done', result)
+                 self.set_status(ACT_OK)
+ 
+-        except ComponentError, error:
++        except ComponentError as error:
+             self.comp.action_event(self, 'failed', Result(str(error)))
+             self.set_status(ACT_ERROR)
+ 
+diff --git a/lib/Shine/Lustre/Actions/Modules.py b/lib/Shine/Lustre/Actions/Modules.py
+index 61c35ef..da4bf03 100644
+--- a/lib/Shine/Lustre/Actions/Modules.py
++++ b/lib/Shine/Lustre/Actions/Modules.py
+@@ -69,7 +69,7 @@ class ServerAction(CommonAction):
+                 self.server.action_event(self, 'done', result)
+                 self.set_status(ACT_OK)
+ 
+-        except ServerError, error:
++        except ServerError as error:
+             self.server.action_event(self, 'failed', Result(str(error)))
+             self.set_status(ACT_ERROR)
+ 
+diff --git a/lib/Shine/Lustre/Actions/Proxy.py b/lib/Shine/Lustre/Actions/Proxy.py
+index 82a3789..59c239a 100644
+--- a/lib/Shine/Lustre/Actions/Proxy.py
++++ b/lib/Shine/Lustre/Actions/Proxy.py
+@@ -18,6 +18,8 @@
+ # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #
+ 
++from __future__ import print_function
++
+ import os
+ import sys
+ import binascii, pickle
+@@ -64,14 +66,14 @@ def shine_msg_unpack(msg):
+     try:
+         version, data = msg[len(SHINE_MSG_MAGIC):].split(':', 1)
+         version = int(version)
+-    except Exception, exp:
++    except Exception as exp:
+         raise ProxyActionUnpackError("Malformed Shine message: %s" % exp)
+ 
+     if version == SHINE_MSG_VERSION:
+         try:
+             # unpack and unpickle object
+             return pickle.loads(binascii.a2b_base64(data))
+-        except Exception, exp:
++        except Exception as exp:
+             msg = "Cannot unpickle message (check Shine and ClusterShell " \
+                   "versions): %s" % exp
+             raise ProxyActionUnpickleError(msg)
+@@ -79,7 +81,7 @@ def shine_msg_unpack(msg):
+     elif version == 2:
+         try:
+             return shine_msg_unpack_v2(data)
+-        except Exception, exp:
++        except Exception as exp:
+             raise ProxyActionUnpackError("Unknown error: %s" % exp)
+ 
+     else:
+@@ -140,7 +142,7 @@ class FSProxyAction(CommonAction):
+         self._silentnodes = NodeSet() # Error nodes without output
+ 
+         if self.fs.debug:
+-            print "FSProxyAction %s on %s" % (action, nodes)
++            print("FSProxyAction %s on %s" % (action, nodes))
+ 
+     def info(self):
+         return ActionInfo(self, description='Proxy action')
+@@ -220,13 +222,13 @@ class FSProxyAction(CommonAction):
+                 evtype = data.pop('evtype')
+ 
+             self.fs.distant_event(evtype, node=node, **data)
+-        except ProxyActionUnpickleError, exp:
++        except ProxyActionUnpickleError as exp:
+             # Maintain a standalone list of unpickling errors.
+             # Node could have unpickling error but still exit with 0
+             msg = str(exp)
+             if msg not in self._errpickle.get(node, ""):
+                 self._errpickle.add(node, msg)
+-        except AttributeError, exp:
++        except AttributeError as exp:
+             msg = "Cannot read message (check Shine and ClusterShell " \
+                   "version): %s" % str(exp)
+             if msg not in self._errpickle.get(node, ""):
+diff --git a/lib/Shine/Lustre/Component.py b/lib/Shine/Lustre/Component.py
+index ff8022d..f83debb 100644
+--- a/lib/Shine/Lustre/Component.py
++++ b/lib/Shine/Lustre/Component.py
+@@ -18,6 +18,8 @@
+ # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #
+ 
++from __future__ import print_function
++
+ import sys
+ 
+ from itertools import ifilter, groupby
+@@ -141,8 +143,8 @@ class Component(object):
+             actions = ""
+             if len(self._list_action()):
+                 actions = "actions: " + ", ".join(self._list_action())
+-            print >> sys.stderr, "ERROR: bad state for %s: %d %s" % \
+-                            (self.label, self.state, actions)
++            print("ERROR: bad state for %s: %d %s" %
++                  (self.label, self.state, actions), file=sys.stderr)
+             self.state = RUNTIME_ERROR
+ 
+     def __getstate__(self):
+diff --git a/lib/Shine/Lustre/Disk.py b/lib/Shine/Lustre/Disk.py
+index ad60e45..3c7c816 100644
+--- a/lib/Shine/Lustre/Disk.py
++++ b/lib/Shine/Lustre/Disk.py
+@@ -83,7 +83,7 @@ class Disk:
+         """
+         try:
+             info = os.stat(self.dev)
+-        except OSError, error:
++        except OSError as error:
+             raise DiskDeviceError(self, str(error))
+ 
+         mode = info[stat.ST_MODE]
+diff --git a/lib/Shine/Lustre/FileSystem.py b/lib/Shine/Lustre/FileSystem.py
+index 81c4048..8962351 100644
+--- a/lib/Shine/Lustre/FileSystem.py
++++ b/lib/Shine/Lustre/FileSystem.py
+@@ -24,6 +24,8 @@ Lustre FileSystem class.
+ Represents a Lustre FS.
+ """
+ 
++from __future__ import print_function
++
+ import os
+ import sys
+ import socket
+@@ -121,7 +123,7 @@ class FileSystem:
+         except socket.error:
+             logging.raiseExceptions = False
+             msg = "Error connecting to syslog, disabling logging."
+-            print >> sys.stderr, "WARNING: %s" % msg
++            print("WARNING: %s" % msg, file=sys.stderr)
+ 
+         return logger
+ 
+@@ -169,7 +171,7 @@ class FileSystem:
+ 
+                 # substitute target parameter by local one
+                 params['comp'] = comp
+-            except KeyError, error:
++            except KeyError as error:
+                 print >> sys.stderr, "ERROR: Component update " \
+                                      "failed (%s)" % str(error)
+ 
+diff --git a/lib/Shine/Lustre/Target.py b/lib/Shine/Lustre/Target.py
+index cf87bbd..fc22ddc 100644
+--- a/lib/Shine/Lustre/Target.py
++++ b/lib/Shine/Lustre/Target.py
+@@ -318,7 +318,7 @@ class Target(Component, Disk):
+             if self.journal:
+                 self.journal.full_check()
+ 
+-        except (ComponentError, DiskDeviceError), error:
++        except (ComponentError, DiskDeviceError) as error:
+             self.local_state = TARGET_ERROR
+             raise ComponentError(self, str(error))
+ 
+@@ -566,7 +566,7 @@ class Journal(Component):
+ 
+         try:
+             info = os.stat(self.dev)
+-        except OSError, exp:
++        except OSError as exp:
+             raise ComponentError(self, str(exp))
+ 
+         if not stat.S_ISBLK(info[stat.ST_MODE]):
+diff --git a/tests/Lustre/ComponentTest.py b/tests/Lustre/ComponentTest.py
+index 68eeb49..d60a0e3 100644
+--- a/tests/Lustre/ComponentTest.py
++++ b/tests/Lustre/ComponentTest.py
+@@ -37,7 +37,7 @@ class ComponentGroupTest(unittest.TestCase):
+         # Could not add() twice the same component
+         try:
+             grp.add(comp)
+-        except KeyError, error:
++        except KeyError as error:
+             txt = "'A component with id comp-A-foo@tcp already exists.'"
+             self.assertEqual(str(error), txt)
+ 
+diff --git a/tests/Lustre/FileSystemTest.py b/tests/Lustre/FileSystemTest.py
+index 8e04c64..fff13bd 100644
+--- a/tests/Lustre/FileSystemTest.py
++++ b/tests/Lustre/FileSystemTest.py
+@@ -148,7 +148,7 @@ class SimpleFileSystemTest(unittest.TestCase):
+         fs.new_client(badsrv2, '/testfs')
+         try:
+             fs.install(fs_config_file=Utils.makeTempFilename())
+-        except FSRemoteError, ex:
++        except FSRemoteError as ex:
+             self.assertEqual(str(ex.nodes), 'badnode[1-2]')
+             self.assertEqual(ex.rc, 1)
+             # Partial comparison to support RHEL5 OpenSSH output
+diff --git a/tests/Lustre/TargetTest.py b/tests/Lustre/TargetTest.py
+index 07abee5..2ee3cc2 100755
+--- a/tests/Lustre/TargetTest.py
++++ b/tests/Lustre/TargetTest.py
+@@ -46,7 +46,6 @@ class TargetTest(unittest.TestCase):
+         tgt2.add_server(srv2b)
+         tgt2.failover(NodeSet('foo2'))
+ 
+-        print tgt2.uniqueid()
+         self.assertEqual(tgt2.uniqueid(), tgt1.uniqueid())
+ 
+     def testAllServers(self):
+diff --git a/tests/Utils.py b/tests/Utils.py
+index 761cef9..4d833cf 100644
+--- a/tests/Utils.py
++++ b/tests/Utils.py
+@@ -2,6 +2,8 @@
+ # Utilities function for Shine unit tests.
+ # Written by A. Degremont
+ 
++from __future__ import print_function
++
+ import os
+ import socket
+ import tempfile
+@@ -24,7 +26,7 @@ def rootonly(method):
+         if os.getuid() == 0:
+             method(self)
+         else:
+-            print "SKIP. Root permission required."
++            print("SKIP. Root permission required.")
+     root_tested.__name__ = method.__name__
+     root_tested.__doc__ = method.__doc__
+     return root_tested
