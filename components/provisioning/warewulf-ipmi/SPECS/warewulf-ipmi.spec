@@ -31,7 +31,7 @@ Requires: warewulf-common%{PROJ_DELIM}
 Requires: %{name}-initramfs-%{_arch} = %{version}-%{release}
 
 
-%if 0%{?rhel} >= 8 || 0%{?sle_version} >= 150000
+%if 0%{?rhel} >= 8 || 0%{?sle_version} >= 150000 || 0%{?openEuler}
 %global localipmi 1
 BuildRequires: ipmitool
 Requires: ipmitool
