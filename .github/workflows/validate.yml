@@ -81,4 +81,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: rpm-artifact
-        path: /home/ohpc/rpmbuild/
+        path: |
+          "**/gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.src.rpm"
+          "**/gnu12-compilers-ohpc-*.rpm"
+          "**/gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.rpm"
