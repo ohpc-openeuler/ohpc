@@ -78,3 +78,7 @@ jobs:
       run: |
         . /etc/profile.d/lmod.sh
         tests/ci/run_build.py ohpc ${{ steps.files.outputs.added_modified }}
+    - uses: actions/upload-artifact@v3
+      with:
+        name: rpm-artifact
+        path: /github/home/rpmbuild/
