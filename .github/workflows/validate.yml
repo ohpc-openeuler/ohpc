@@ -80,11 +80,9 @@ jobs:
         tests/ci/run_build.py ohpc ${{ steps.files.outputs.added_modified }}
     - name: Debug
       run: |
-        ls -la /root
-        ls -la /home/
-        ls -la /root/rpmbuild/
+        find / -name gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.x86_64.rpm
     - uses: actions/upload-artifact@v3
       with:
         name: rpm-artifact
         path: |
-          "/root/rpmbuild/RPMS/x86_64/gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.x86_64.rpm"
+          "/github/home/rpmbuild/RPMS/x86_64/gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.x86_64.rpm"
