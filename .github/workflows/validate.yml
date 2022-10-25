@@ -80,9 +80,7 @@ jobs:
         tests/ci/run_build.py ohpc ${{ steps.files.outputs.added_modified }}
     - name: Debug
       run: |
-        ls -la /root
-        ls -la /home/
-        ls -la /root/rpmbuild/
+        find ./ -name /gnu12-compilers-ohpc-*.rpm
     - uses: actions/upload-artifact@v3
       with:
         name: rpm-artifact
