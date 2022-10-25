@@ -78,10 +78,13 @@ jobs:
       run: |
         . /etc/profile.d/lmod.sh
         tests/ci/run_build.py ohpc ${{ steps.files.outputs.added_modified }}
+    - name: Debug
+      run: |
+        ls -la /root
+        ls -la /home/
+        ls -la /root/rpmbuild/
     - uses: actions/upload-artifact@v3
       with:
         name: rpm-artifact
         path: |
-          "**/gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.src.rpm"
-          "**/gnu12-compilers-ohpc-*.rpm"
-          "**/gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.rpm"
+          "/root/rpmbuild/RPMS/x86_64/gnu12-compilers-ohpc-12.2.0-1.ohpc.2.0.0.x86_64.rpm"
