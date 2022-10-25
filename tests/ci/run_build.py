@@ -91,41 +91,6 @@ def build_srpm_and_rpm(command, family=None):
         return False
 
     logging.info(result.stdout.decode('utf-8'))
-
-    tmp_src_rpm = os.path.join('/tmp', os.path.basename(src_rpm))
-
-    try:
-        os.unlink(tmp_src_rpm)
-    except FileNotFoundError:
-        pass
-    shutil.move(src_rpm, '/tmp/')
-    src_rpm = tmp_src_rpm
-
-    rebuild_command = [
-        'su',
-        build_user,
-        '-l',
-        '-c',
-        'rpmbuild --rebuild %s' % src_rpm,
-    ]
-
-    if family is not None:
-        rebuild_command[-1] += " --define 'mpi_family %s'" % family
-
-    logging.info("About to run command %s" % ' '.join(rebuild_command))
-    result = subprocess.run(
-        rebuild_command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    if result.returncode != 0:
-        logging.info("Running 'rpmbuild --rebuild' failed")
-        logging.error(result.stdout.decode('utf-8'))
-        logging.error(result.stderr.decode('utf-8'))
-        return False
-
-    logging.info(result.stdout.decode('utf-8'))
-
     return True
 
 
