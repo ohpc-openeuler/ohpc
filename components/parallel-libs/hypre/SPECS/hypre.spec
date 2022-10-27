@@ -5,7 +5,7 @@
 # release package (if available) in order to apply patches, perform customized
 # build/install configurations, and supply additional files to support
 # desired integration conventions.
-#
+# for test
 #----------------------------------------------------------------------------eh-
 
 # Build that is is dependent on compiler toolchain and MPI
