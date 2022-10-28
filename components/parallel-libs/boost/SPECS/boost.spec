@@ -106,7 +106,7 @@ export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-unused-local-type
 export RPM_LD_FLAGS
 
 cat << "EOF" >> rpm-config.jam
-%if 0%{?rhel} >= 9
+%if 0%{?rhel} >= 9 || 0%{?openEuler}
 using python : %{python3_version} : %{__python3} : /usr/include/python%{python3_version} ;
 %else
 using python : %{python3_version} : %{__python3} : /usr/include/python%{python3_version}m ;
