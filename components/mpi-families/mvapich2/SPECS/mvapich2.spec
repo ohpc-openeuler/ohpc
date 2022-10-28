@@ -65,6 +65,10 @@ BuildRequires: rdma-core-devel infiniband-diags-devel
 Buildrequires: rdma-core-devel libibmad-devel
 %endif
 
+%if 0%{?openEuler}
+Buildrequires: m4
+%endif
+
 Requires: prun%{PROJ_DELIM}
 BuildRequires: bison make
 BuildRequires: zlib-devel
