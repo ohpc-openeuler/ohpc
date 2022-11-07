@@ -43,6 +43,7 @@ BuildRequires:  libquadmath-devel
 %endif
 %endif
 
+BuildRequires:  make
 BuildRequires:  fdupes
 BuildRequires:  dos2unix
 BuildRequires:  gmp-devel
