@@ -36,15 +36,13 @@ BuildRequires:  kernel-default-devel
 #!BuildIgnore: post-build-checks
 %endif
 
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?openEuler}
 BuildRequires: kernel
 BuildRequires: kernel-devel
 BuildRequires: kernel-abi-whitelists kernel-rpm-macros elfutils-libelf-devel
 %endif
 
-%if 0%{?suse_version}
 %kernel_module_package default
-%endif
 
 %description
 Allows safer access to model specific registers (MSRs)
