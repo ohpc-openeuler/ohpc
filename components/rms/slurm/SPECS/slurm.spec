@@ -147,6 +147,11 @@ BuildRequires: pkgconfig
 %endif
 %endif
 
+%if 0%{?openEuler}
+BuildRequires: perl perl-devel
+Requires: perl perl-devel
+%endif
+
 BuildRequires: perl(ExtUtils::MakeMaker)
 
 #needed to enable jobcomp_elasticsearch plugin
@@ -342,7 +347,7 @@ Summary: Slurm REST API translator
 Group: System Environment/Base
 Requires: %{name}%{?_isa} = %{version}-%{release}
 BuildRequires: http-parser-devel
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?openEuler}
 BuildRequires: json-c-devel
 %endif
 %if 0%{?suse_version:1}
@@ -367,7 +372,7 @@ notifies slurm about failed nodes.
 Summary: Graphical user interface to view and modify Slurm state
 Group: %{PROJ_NAME}/rms
 Requires: %{pname}%{PROJ_DELIM} = %{version}-%{release}
-BuildRequires: gtk2-devel
+BuildRequires: gtk2-devel gcc
 Requires: gtk2
 %description  -n %{pname}-sview%{PROJ_DELIM}
 This package provides sview, which can be used to view Slurm configuration, job,
@@ -381,7 +386,7 @@ select information.
 %setup -q -n %{slurm_source_dir}
 
 %build
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?openEuler}
 export PATH="$PWD/bin:$PATH"
 %endif
 %configure \
@@ -407,7 +412,7 @@ export PATH="$PWD/bin:$PATH"
 make %{?_smp_mflags}
 
 %install
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?openEuler}
 export PATH="$PWD/bin:$PATH"
 %endif
 
