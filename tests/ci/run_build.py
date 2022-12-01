@@ -37,9 +37,9 @@ if skip_ci_specs_env:
 
 for row in reader:
     key = row.pop('NAME')
-    if key == 'ID_LIKE':
+    if key in ['ID_LIKE', 'ID']:
         for item in list(row.items())[0]:
-            if 'fedora' in item:
+            if 'fedora' in item or 'openEuler' in item:
                 dnf_based = True
     if key == 'VERSION_ID':
         version_id = list(row.items())[0][1]
@@ -51,7 +51,7 @@ def run_command(command):
         command,
         bufsize=1,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.PIPE,
         universal_newlines=True,
     )
 
