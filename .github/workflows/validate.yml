@@ -1,10 +1,10 @@
 name: Validate
 
 on:
-  push:
   pull_request:
     branches:
       - 2.x
+      - 2.x-for-openEuler
 
 env:
   SKIP_CI_SPECS: |
@@ -110,6 +110,23 @@ jobs:
     steps:
     - name: Install git
       run: zypper -n install git
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup
+      run: tests/ci/prepare-ci-environment.sh
+    - id: files
+      uses: jitterbit/get-changed-files@v1
+    - name: Validate Build
+      run: |
+        . /etc/profile.d/lmod.sh
+        tests/ci/run_build.py ohpc ${{ steps.files.outputs.added_modified }}
+
+  build_on_openEuler:
+    runs-on: ubuntu-latest
+    container:
+      image: docker.io/openeuler/openeuler:22.03-lts
+    steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0

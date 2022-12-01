@@ -46,8 +46,19 @@ for like in ${ID_LIKE}; do
 	fi
 done
 
+
+if [ "${ID}" = "openEuler" ]; then
+	PKG_MANAGER=dnf
+	FACTORY_VERSION=
+fi
+
+
 if [ "${PKG_MANAGER}" = "dnf" ]; then
-	OHPC_RELEASE="http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/ohpc-release-2-1.el8.x86_64.rpm"
+	if [ "${ID}" = "openEuler" ]; then
+		OHPC_RELEASE="http://121.36.3.168:82/home:/huangtianhua:/ohpc/standard_x86_64/x86_64/ohpc-release-2-1.oe2203.ohpc.2.0.0.x86_64.rpm"
+	else
+		OHPC_RELEASE="http://repos.openhpc.community/OpenHPC/2/CentOS_8/x86_64/ohpc-release-2-1.el8.x86_64.rpm"
+	fi
 else
 	OHPC_RELEASE="http://repos.openhpc.community/OpenHPC/2/Leap_15/x86_64/ohpc-release-2-1.leap15.x86_64.rpm"
 fi
@@ -67,9 +78,14 @@ fi
 COMMON_PKGS="wget python3"
 
 if [ "${PKG_MANAGER}" = "dnf" ]; then
-	loop_command "${PKG_MANAGER}" -y install ${COMMON_PKGS} epel-release dnf-plugins-core git rpm-build gawk "${OHPC_RELEASE}"
-	loop_command "${PKG_MANAGER}" config-manager --set-enabled powertools
-	loop_command "${PKG_MANAGER}" config-manager --set-enabled devel
+	if [ "${ID}" = "openEuler" ]; then
+		loop_command "${PKG_MANAGER}" -y install ${COMMON_PKGS} openEuler-release dnf-plugins-core git rpm-build gawk "${OHPC_RELEASE}"
+	else
+		loop_command "${PKG_MANAGER}" -y install ${COMMON_PKGS} epel-release dnf-plugins-core git rpm-build gawk "${OHPC_RELEASE}"
+		loop_command "${PKG_MANAGER}" config-manager --set-enabled powertools
+		loop_command "${PKG_MANAGER}" config-manager --set-enabled devel
+	fi
+
 	if [ "${FACTORY_VERSION}" != "" ]; then
 		loop_command wget "${FACTORY_REPOSITORY}" -O "${FACTORY_REPOSITORY_DESTINATION}"
 	fi
