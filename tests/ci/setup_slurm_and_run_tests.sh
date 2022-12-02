@@ -48,6 +48,7 @@ chown root.root /var/log/munge
 
 /usr/sbin/munged -f
 /usr/sbin/slurmctld
+sleep 5
 slurmd -N c0
 slurmd -N c1
 
