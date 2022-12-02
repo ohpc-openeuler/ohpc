@@ -48,7 +48,7 @@ def run_command(command):
         command,
         bufsize=1,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.PIPE,
         universal_newlines=True,
     )
 
