@@ -82,9 +82,10 @@ if [ "${PKG_MANAGER}" = "dnf" ]; then
 		loop_command "${PKG_MANAGER}" -y install ${COMMON_PKGS} openEuler-release dnf-plugins-core git rpm-build gawk "${OHPC_RELEASE}"
 	else
 		loop_command "${PKG_MANAGER}" -y install ${COMMON_PKGS} epel-release dnf-plugins-core git rpm-build gawk "${OHPC_RELEASE}"
+		loop_command "${PKG_MANAGER}" config-manager --set-enabled powertools
+		loop_command "${PKG_MANAGER}" config-manager --set-enabled devel
 	fi
-	loop_command "${PKG_MANAGER}" config-manager --set-enabled powertools
-	loop_command "${PKG_MANAGER}" config-manager --set-enabled devel
+
 	if [ "${FACTORY_VERSION}" != "" ]; then
 		loop_command wget "${FACTORY_REPOSITORY}" -O "${FACTORY_REPOSITORY_DESTINATION}"
 	fi
