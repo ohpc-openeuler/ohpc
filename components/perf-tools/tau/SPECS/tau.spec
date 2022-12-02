@@ -59,6 +59,7 @@ BuildRequires: chrpath sed grep which make
 BuildRequires: postgresql-devel binutils-devel
 BuildRequires: zlib-devel python3-devel
 BuildRequires: pdtoolkit-%{compiler_family}%{PROJ_DELIM}
+BuildRequires: %{mpi_family}-%{compiler_family}%{PROJ_DELIM}
 
 Requires: lmod%{PROJ_DELIM} >= 7.6.1
 Requires: pdtoolkit-%{compiler_family}%{PROJ_DELIM}
