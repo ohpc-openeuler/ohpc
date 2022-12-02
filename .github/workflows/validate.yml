@@ -127,11 +127,11 @@ jobs:
     container:
       image: docker.io/openeuler/openeuler:22.03-lts
     steps:
-    - name: Setup
-      run: tests/ci/prepare-ci-environment.sh
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Setup
+      run: tests/ci/prepare-ci-environment.sh
     - id: files
       uses: jitterbit/get-changed-files@v1
     - name: Validate Build
