@@ -42,6 +42,10 @@ BuildRequires: kernel-devel
 BuildRequires: kernel-abi-whitelists kernel-rpm-macros elfutils-libelf-devel
 %endif
 
+%if 0%{?openEuler}
+BuildRequires: kernel kernel-devel kernel-rpm-macros
+%endif
+
 %kernel_module_package default
 
 %description
